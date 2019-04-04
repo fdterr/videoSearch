@@ -19,3 +19,10 @@ form div {
   margin: 1em;
   display: inline-block;
 }
+
+.search {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10em;
+  width: 10%;
+}
