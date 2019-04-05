@@ -13,7 +13,8 @@ const makeSource = players => {
           player.playerId
         }.jpg`}
       />
-    )
+    ),
+    id: player.playerId
   }));
   return source;
 };
@@ -27,8 +28,11 @@ export default class SearchExampleStandard extends Component {
   resetComponent = () =>
     this.setState({...this.state, isLoading: false, results: [], value: ''});
 
-  handleResultSelect = (e, {result}) =>
-    this.setState({...this.state, value: result.title});
+  handleResultSelect = (e, {result}) => {
+    // this.setState({...this.state, value: result.title, selected: result.title});
+    console.log('result', result);
+    this.props.history.push(`/players/video/${result.id}`);
+  };
 
   handleSearchChange = (e, {value}) => {
     this.setState({...this.state, isLoading: true, value});

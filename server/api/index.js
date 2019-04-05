@@ -68,7 +68,11 @@ router.get('/player/:id/games', async (req, res, next) => {
 
 router.get('/player/:id/content', async (req, res, next) => {
   const games = await getPlayerGames(req.params.id, 'pitching', '2019');
-  const content = await getPlayerContent('Jacob deGrom', 567365);
+  let content = [];
+  for (let i = 0; i < Math.min(games.length, 10); i++) {
+    const highlights = await getPlayerContent('Jacob deGrom', games[i]);
+    content.push(highlights);
+  }
   res.json(content);
 });
 
@@ -109,6 +113,7 @@ const getPlayerGames = async (player, group, season) => {
 };
 
 const getPlayerContent = async (player, game) => {
+  console.log('player is', player, 'game is', game);
   let highlights = [];
 
   const {data} = await axios.get(
@@ -118,13 +123,18 @@ const getPlayerContent = async (player, game) => {
   // console.log('player conent data is', content);
   for (let i = 0; i < content.length; i++) {
     const highlight = content[i];
+    console.log(
+      'highlight icnludes player',
+      highlight.description.includes(player),
+      highlight
+    );
     if (highlight.type === 'video') {
       console.log(highlight.description.includes(player));
-      if (highlight.description.includes(player) !== 0) {
+      if (highlight.description.includes(player)) {
         highlights.push(highlight);
       }
     }
   }
-  console.log('highlights are', highlights);
+  // console.log('highlights are', highlights);
   return highlights;
 };
