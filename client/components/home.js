@@ -1,20 +1,23 @@
 import _ from 'lodash';
 import faker from 'faker';
 import React, {Component} from 'react';
-import {Search, Grid, Header, Segment} from 'semantic-ui-react';
+import {Search, Label} from 'semantic-ui-react';
 import axios from 'axios';
 
-// const players = {
-
-// }
-
-// const source = _.times(5, () => ({
-//   title: faker.company.companyName(),
-//   description: faker.company.catchPhrase(),
-//   image: faker.internet.avatar(),
-//   price: faker.finance.amount(0, 100, 2, '$')
-// }));
-const source = {};
+const makeSource = players => {
+  const source = players.map(player => ({
+    title: player.fullName,
+    image: (
+      <img
+        src={`https://gd.mlb.com/images/gameday/mugshots/mlb/${
+          player.playerId
+        }.jpg`}
+      />
+    )
+  }));
+  return source;
+};
+let source = [];
 
 export default class SearchExampleStandard extends Component {
   componentWillMount() {
@@ -22,12 +25,13 @@ export default class SearchExampleStandard extends Component {
   }
 
   resetComponent = () =>
-    this.setState({isLoading: false, results: [], value: ''});
+    this.setState({...this.state, isLoading: false, results: [], value: ''});
 
-  handleResultSelect = (e, {result}) => this.setState({value: result.title});
+  handleResultSelect = (e, {result}) =>
+    this.setState({...this.state, value: result.title});
 
   handleSearchChange = (e, {value}) => {
-    this.setState({isLoading: true, value});
+    this.setState({...this.state, isLoading: true, value});
 
     setTimeout(() => {
       if (this.state.value.length < 1) return this.resetComponent();
@@ -36,6 +40,7 @@ export default class SearchExampleStandard extends Component {
       const isMatch = result => re.test(result.title);
 
       this.setState({
+        ...this.state,
         isLoading: false,
         results: _.filter(source, isMatch)
       });
@@ -45,14 +50,18 @@ export default class SearchExampleStandard extends Component {
   async componentDidMount() {
     const {data} = await axios.get('/api/players');
     console.log('data is', data);
+    source = makeSource(data);
+    console.log('source is', source);
+    this.setState({...this.state, source});
   }
 
   render() {
     const {isLoading, value, results} = this.state;
+    console.log('this.state.source', this.state.source);
 
     return (
       <div className="search">
-        {!!source && (
+        {!!this.state.source && (
           <Search
             loading={isLoading}
             onResultSelect={this.handleResultSelect}
