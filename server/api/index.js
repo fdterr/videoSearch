@@ -44,7 +44,7 @@ router.put('/player/:id/content', async (req, res, next) => {
   const games = req.body;
   console.log('games are', games);
   let content = [];
-  for (let i = 0; i < Math.min(games.length, 10); i++) {
+  for (let i = 0; i < games.length; i++) {
     const highlights = await getPlayerContent('Jacob deGrom', games[i]);
     content.push(highlights);
   }

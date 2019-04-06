@@ -5,7 +5,8 @@ import {
   // Header,
   Segment,
   Embed,
-  TransitionablePortal
+  TransitionablePortal,
+  Visibility
 } from 'semantic-ui-react';
 import axios from 'axios';
 import VideoCard from './videoCard';
@@ -15,7 +16,7 @@ export default class Player extends Component {
     super();
     this.state = {
       loading: true,
-      player: {},
+      player: [],
       animation: 'browse',
       duration: 500,
       open: false,
@@ -41,12 +42,12 @@ export default class Player extends Component {
 
   async componentDidMount() {
     const playerId = this.props.match.params.id;
-    let {data} = await axios.get(`/api/player/${playerId}/games/2019`);
+    let {data} = await axios.get(`/api/player/${playerId}/games/2018`);
     const games = data;
 
     let response = await axios.put(
       `/api/player/${playerId}/content`,
-      data.slice(0, 9)
+      data.splice(0, 9)
     );
     data = response.data;
 
