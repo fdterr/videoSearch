@@ -21,19 +21,17 @@ export default class Player extends Component {
       open: false,
       video: '',
       image: '',
-      dimmed: false
+      dimmed: false,
+      games: []
     };
   }
 
   handleClick = (video, image) => {
-    // console.log('video is', video, 'image is', image);
-    console.log('setting state in handleclick');
     this.setState({
       ...this.state,
       open: !this.state.open,
       video: !this.state.open ? video : undefined,
       image: !this.state.open ? image : undefined
-      // dimmed: !this.state.dimmed
     });
   };
 
@@ -43,21 +41,35 @@ export default class Player extends Component {
 
   async componentDidMount() {
     const playerId = this.props.match.params.id;
-    const {data} = await axios.get(`/api/player/${playerId}/content`);
+    let {data} = await axios.get(`/api/player/${playerId}/games/2019`);
+    const games = data;
+
+    let response = await axios.put(
+      `/api/player/${playerId}/content`,
+      data.slice(0, 9)
+    );
+    data = response.data;
+
     const highlights = [];
     for (let i = 0; i < data.length; i++) {
       for (let j = 0; j < data[i].length; j++) {
+        const event = data[i][j];
+        const image = event.image.cuts.find(cut => {
+          if (cut.aspectRatio === '16:9' && cut.width > 500) {
+            return true;
+          }
+        });
         const highlight = {
-          image: data[i][j].image.cuts[11].src,
-          video: data[i][j].playbacks[0].url,
-          key: data[i][j].guid,
-          blurb: data[i][j].blurb,
-          description: data[i][j].description
+          image: image.src,
+          video: event.playbacks[0].url,
+          key: event.guid,
+          blurb: event.blurb,
+          description: event.description
         };
         highlights.push(highlight);
       }
     }
-    this.setState({...this.state, player: highlights, loading: false});
+    this.setState({...this.state, player: highlights, loading: false, games});
   }
 
   render() {

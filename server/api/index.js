@@ -21,6 +21,36 @@ router.use('/teams', async (req, res, next) => {
   }
 });
 
+router.get('/players', async (req, res, next) => {
+  try {
+    const players = await Player.findAll();
+    res.json(players);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/player/:id/games/:season', async (req, res, next) => {
+  const games = await getPlayerGames(
+    req.params.id,
+    'pitching',
+    req.params.season
+  );
+  res.json(games);
+});
+
+router.put('/player/:id/content', async (req, res, next) => {
+  // const games = await getPlayerGames(req.params.id, 'pitching', '2018');
+  const games = req.body;
+  console.log('games are', games);
+  let content = [];
+  for (let i = 0; i < Math.min(games.length, 10); i++) {
+    const highlights = await getPlayerContent('Jacob deGrom', games[i]);
+    content.push(highlights);
+  }
+  res.json(content);
+});
+
 router.get('/createList', async (req, res, next) => {
   const teams = await getTeams();
   const players = [];
@@ -45,30 +75,6 @@ router.get('/createList', async (req, res, next) => {
       });
     });
   }
-});
-
-router.get('/players', async (req, res, next) => {
-  try {
-    const players = await Player.findAll();
-    res.json(players);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get('/player/:id/games', async (req, res, next) => {
-  const games = await getPlayerGames(req.params.id, 'pitching', '2019');
-  res.json(games);
-});
-
-router.get('/player/:id/content', async (req, res, next) => {
-  const games = await getPlayerGames(req.params.id, 'pitching', '2019');
-  let content = [];
-  for (let i = 0; i < Math.min(games.length, 10); i++) {
-    const highlights = await getPlayerContent('Jacob deGrom', games[i]);
-    content.push(highlights);
-  }
-  res.json(content);
 });
 
 router.use((req, res, next) => {
