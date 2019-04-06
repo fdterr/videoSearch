@@ -29,7 +29,7 @@ export default class SearchExampleStandard extends Component {
     this.setState({...this.state, isLoading: false, results: [], value: ''});
 
   handleResultSelect = (e, {result}) => {
-    console.log('result', result);
+    // console.log('result', result);
     this.props.history.push(`/players/video/${result.id}`);
   };
 
@@ -52,15 +52,15 @@ export default class SearchExampleStandard extends Component {
 
   async componentDidMount() {
     const {data} = await axios.get('/api/players');
-    console.log('data is', data);
+    // console.log('data is', data);
     source = makeSource(data);
-    console.log('source is', source);
+    // console.log('source is', source);
     this.setState({...this.state, source});
   }
 
   render() {
     const {isLoading, value, results} = this.state;
-    console.log('this.state.source', this.state.source);
+    // console.log('this.state.source', this.state.source);
 
     return (
       <div className="search">

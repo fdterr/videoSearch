@@ -2,7 +2,7 @@ import React from 'react';
 import {Card, Image} from 'semantic-ui-react';
 
 const VideoCard = props => {
-  console.log('image is', props.highlight.image);
+  // console.log('image is', props.highlight.image);
   return (
     <Card
       className="videoCard"

@@ -43,11 +43,16 @@ router.put('/player/:id/content', async (req, res, next) => {
   // const games = await getPlayerGames(req.params.id, 'pitching', '2018');
   const games = req.body;
   console.log('games are', games);
+  console.log('params are', req.params.id);
   let content = [];
   for (let i = 0; i < games.length; i++) {
-    const highlights = await getPlayerContent('Jacob deGrom', games[i]);
+    const highlights = await getPlayerContent(
+      await getPlayerName(req.params.id),
+      games[i]
+    );
     content.push(highlights);
   }
+  console.log('content is', content);
   res.json(content);
 });
 
@@ -129,4 +134,11 @@ const getPlayerContent = async (player, game) => {
     }
   }
   return highlights;
+};
+
+const getPlayerName = async playerId => {
+  const {data} = await axios.get(
+    `http://statsapi.mlb.com/api/v1/people/${playerId}`
+  );
+  return data.people[0].fullName;
 };

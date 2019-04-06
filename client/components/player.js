@@ -16,14 +16,14 @@ export default class Player extends Component {
     super();
     this.state = {
       loading: true,
-      player: [],
       animation: 'browse',
       duration: 500,
       open: false,
       video: '',
       image: '',
       dimmed: false,
-      games: []
+      games: [],
+      highlights: []
     };
   }
 
@@ -42,16 +42,48 @@ export default class Player extends Component {
 
   async componentDidMount() {
     const playerId = this.props.match.params.id;
-    let {data} = await axios.get(`/api/player/${playerId}/games/2018`);
-    const games = data;
+    let {data} = await axios.get(`/api/player/${playerId}/games/2019`);
+    await this.grabGames(data, playerId);
+    // const games = data;
 
-    let response = await axios.put(
+    // let response = await axios.put(
+    //   `/api/player/${playerId}/content`,
+    //   // data.splice(0, 9)
+    //   data.splice(0, 2)
+    // );
+    // data = response.data;
+
+    // const {highlights} = this.state;
+    // for (let i = 0; i < data.length; i++) {
+    //   for (let j = 0; j < data[i].length; j++) {
+    //     const event = data[i][j];
+    //     const image = event.image.cuts.find(cut => {
+    //       if (cut.aspectRatio === '16:9' && cut.width > 500) {
+    //         return true;
+    //       }
+    //     });
+    //     const highlight = {
+    //       image: image.src,
+    //       video: event.playbacks[0].url,
+    //       key: event.guid,
+    //       blurb: event.blurb,
+    //       description: event.description
+    //     };
+    //     highlights.push(highlight);
+    //   }
+    // }
+    // this.setState({...this.state, player: highlights, loading: false, games});
+  }
+
+  grabGames = async (games, playerId) => {
+    let {data} = await axios.put(
       `/api/player/${playerId}/content`,
-      data.splice(0, 9)
+      // data.splice(0, 9)
+      games.splice(0, 2)
     );
-    data = response.data;
+    // data = response.data;
 
-    const highlights = [];
+    const {highlights} = this.state;
     for (let i = 0; i < data.length; i++) {
       for (let j = 0; j < data[i].length; j++) {
         const event = data[i][j];
@@ -70,8 +102,8 @@ export default class Player extends Component {
         highlights.push(highlight);
       }
     }
-    this.setState({...this.state, player: highlights, loading: false, games});
-  }
+    this.setState({...this.state, highlights, loading: false, games});
+  };
 
   render() {
     const {animation, duration, open, dimmed} = this.state;
@@ -85,7 +117,7 @@ export default class Player extends Component {
           ) : (
             <Dimmer.Dimmable as={Segment} dimmed={open}>
               <div className="videoList">
-                {this.state.player.map(highlight => {
+                {this.state.highlights.map(highlight => {
                   return (
                     <VideoCard highlight={highlight} open={this.handleClick} />
                   );
