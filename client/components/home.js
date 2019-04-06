@@ -29,7 +29,6 @@ export default class SearchExampleStandard extends Component {
     this.setState({...this.state, isLoading: false, results: [], value: ''});
 
   handleResultSelect = (e, {result}) => {
-    // this.setState({...this.state, value: result.title, selected: result.title});
     console.log('result', result);
     this.props.history.push(`/players/video/${result.id}`);
   };

@@ -8,11 +8,8 @@ router.use('/teams', async (req, res, next) => {
   try {
     const {data} = await axios.get('http://statsapi.mlb.com/api/v1/teams');
     const allTeams = data.teams;
-    console.log('data is', typeof data);
     const teams = [];
     allTeams.forEach(team => {
-      // for (let team in data) {
-      // console.log('team is', team);
       const id = team.league.id;
       if (id === 104 || id === 103) {
         teams.push(team.id);
@@ -26,7 +23,6 @@ router.use('/teams', async (req, res, next) => {
 
 router.get('/createList', async (req, res, next) => {
   const teams = await getTeams();
-  // console.log('teams is', teams);
   const players = [];
   for (let i = 0; i < teams.length; i++) {
     const id = teams[i];
@@ -54,7 +50,6 @@ router.get('/createList', async (req, res, next) => {
 router.get('/players', async (req, res, next) => {
   try {
     const players = await Player.findAll();
-    // console.log('players are', players);
     res.json(players);
   } catch (err) {
     next(err);
@@ -85,11 +80,8 @@ router.use((req, res, next) => {
 const getTeams = async () => {
   const {data} = await axios.get('http://statsapi.mlb.com/api/v1/teams');
   const allTeams = data.teams;
-  console.log('data is', typeof data);
   const teams = [];
   await allTeams.forEach(team => {
-    // for (let team in data) {
-    // console.log('team is', team);
     const id = team.league.id;
     if (id === 104 || id === 103) {
       teams.push(team.id);
@@ -102,7 +94,6 @@ const getPlayerGames = async (player, group, season) => {
   const {data} = await axios.get(
     `http://statsapi.mlb.com/api/v1/people/${player}/stats?stats=gameLog&season=${season}`
   );
-  // console.log('data is', data);
   const splits = data.stats[0].splits;
   const games = [];
   splits.forEach(game => {
@@ -113,28 +104,23 @@ const getPlayerGames = async (player, group, season) => {
 };
 
 const getPlayerContent = async (player, game) => {
-  console.log('player is', player, 'game is', game);
   let highlights = [];
 
   const {data} = await axios.get(
     `http://statsapi.mlb.com/api/v1/game/${game}/content`
   );
   const content = data.highlights.highlights.items;
-  // console.log('player conent data is', content);
   for (let i = 0; i < content.length; i++) {
     const highlight = content[i];
-    console.log(
-      'highlight icnludes player',
-      highlight.description.includes(player),
-      highlight
-    );
-    if (highlight.type === 'video') {
-      console.log(highlight.description.includes(player));
-      if (highlight.description.includes(player)) {
-        highlights.push(highlight);
+    try {
+      if (highlight.type === 'video') {
+        if (highlight.description.includes(player)) {
+          highlights.push(highlight);
+        }
       }
+    } catch (err) {
+      console.error('error!', highlight);
     }
   }
-  // console.log('highlights are', highlights);
   return highlights;
 };

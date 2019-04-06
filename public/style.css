@@ -26,3 +26,19 @@ form div {
   margin-top: 10em;
   width: 10%;
 }
+
+.videoList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  /* align-items: center; */
+  /* align-content: space-around; */
+  margin-left: auto;
+  margin-right: auto;
+  width: 95vw;
+}
+
+.videoCard {
+  margin: 10px !important;
+  width: 365px !important;
+}
