@@ -42,3 +42,9 @@ form div {
   margin: 10px !important;
   width: 365px !important;
 }
+
+.videoPlaceholder {
+  width: 365px !important;
+  margin: 10px !important;
+  height: 276.75px;
+}

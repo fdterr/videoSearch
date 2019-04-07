@@ -23,8 +23,12 @@ export default class Player extends Component {
       image: '',
       dimmed: false,
       games: [],
-      highlights: []
+      highlights: [],
+      playerId: 0,
+      loadingPreview: false
     };
+    this.grabGames = this.grabGames.bind(this);
+    this.grabGamesHelper = this.grabGamesHelper.bind(this);
   }
 
   handleClick = (video, image) => {
@@ -42,7 +46,7 @@ export default class Player extends Component {
 
   async componentDidMount() {
     const playerId = this.props.match.params.id;
-    let {data} = await axios.get(`/api/player/${playerId}/games/2019`);
+    let {data} = await axios.get(`/api/player/${playerId}/games/2018`);
     await this.grabGames(data, playerId);
     // const games = data;
 
@@ -76,6 +80,12 @@ export default class Player extends Component {
   }
 
   grabGames = async (games, playerId) => {
+    console.log('games are', games);
+    const {highlights} = this.state;
+    while (highlights[highlights.length - 1] === 'loader') {
+      highlights.pop();
+    }
+
     let {data} = await axios.put(
       `/api/player/${playerId}/content`,
       // data.splice(0, 9)
@@ -83,7 +93,6 @@ export default class Player extends Component {
     );
     // data = response.data;
 
-    const {highlights} = this.state;
     for (let i = 0; i < data.length; i++) {
       for (let j = 0; j < data[i].length; j++) {
         const event = data[i][j];
@@ -102,7 +111,24 @@ export default class Player extends Component {
         highlights.push(highlight);
       }
     }
-    this.setState({...this.state, highlights, loading: false, games});
+    console.log('highlights are', highlights);
+    this.setState({
+      ...this.state,
+      highlights,
+      loading: false,
+      games,
+      playerId,
+      loadingPreview: false
+    });
+  };
+
+  grabGamesHelper = async () => {
+    const {highlights} = this.state;
+    highlights.push('loader');
+    console.log('setting state');
+    this.setState({...this.state, highlights, loadingPreview: true});
+    console.log('state set');
+    this.grabGames(this.state.games, this.state.playerId);
   };
 
   render() {
@@ -123,6 +149,24 @@ export default class Player extends Component {
                   );
                 })}
               </div>
+              <Visibility
+                // continuous={true}
+                className="visibility"
+                fireOnMount={true}
+                once={false}
+                // continuous={true}
+                onBottomVisible={() => {
+                  console.log('onBottomVisible');
+                  this.grabGamesHelper();
+                }}
+                updateOn="repaint"
+                // onUpdate={() => this.grabGamesHelper()}
+                onOnScreen={() => {
+                  console.log('onOnScreen');
+                  this.grabGamesHelper();
+                }}
+              />
+
               <Dimmer active={open} />
             </Dimmer.Dimmable>
           )}
