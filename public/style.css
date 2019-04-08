@@ -48,3 +48,7 @@ form div {
   margin: 10px !important;
   height: 276.75px;
 }
+
+.visibility {
+  height: 1px;
+}

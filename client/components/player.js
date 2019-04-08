@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {
   Dimmer,
   Loader,
-  // Header,
   Segment,
   Embed,
   TransitionablePortal,
@@ -25,7 +24,8 @@ export default class Player extends Component {
       games: [],
       highlights: [],
       playerId: 0,
-      loadingPreview: false
+      loadingPreview: false,
+      year: 2019
     };
     this.grabGames = this.grabGames.bind(this);
     this.grabGamesHelper = this.grabGamesHelper.bind(this);
@@ -46,44 +46,32 @@ export default class Player extends Component {
 
   async componentDidMount() {
     const playerId = this.props.match.params.id;
-    let {data} = await axios.get(`/api/player/${playerId}/games/2018`);
-    await this.grabGames(data, playerId);
-    // const games = data;
-
-    // let response = await axios.put(
-    //   `/api/player/${playerId}/content`,
-    //   // data.splice(0, 9)
-    //   data.splice(0, 2)
-    // );
-    // data = response.data;
-
-    // const {highlights} = this.state;
-    // for (let i = 0; i < data.length; i++) {
-    //   for (let j = 0; j < data[i].length; j++) {
-    //     const event = data[i][j];
-    //     const image = event.image.cuts.find(cut => {
-    //       if (cut.aspectRatio === '16:9' && cut.width > 500) {
-    //         return true;
-    //       }
-    //     });
-    //     const highlight = {
-    //       image: image.src,
-    //       video: event.playbacks[0].url,
-    //       key: event.guid,
-    //       blurb: event.blurb,
-    //       description: event.description
-    //     };
-    //     highlights.push(highlight);
-    //   }
-    // }
-    // this.setState({...this.state, player: highlights, loading: false, games});
+    const games = await this.getGames(playerId, this.state.year);
+    console.log('mount games are', games);
+    await this.grabGames(games, playerId);
   }
+
+  getGames = async (playerId, year) => {
+    let {data} = await axios.get(`/api/player/${playerId}/games/${year}`);
+    return data;
+  };
 
   grabGames = async (games, playerId) => {
     console.log('games are', games);
+    console.log('year is', this.state.year);
     const {highlights} = this.state;
     while (highlights[highlights.length - 1] === 'loader') {
       highlights.pop();
+    }
+    let {year} = this.state;
+
+    if (!games.length && this.state.year > 2015) {
+      // this.setState()
+      console.log('no games, getting games for one year behind');
+      // await this.setState({...this.state, years: this.state.years - 1});
+      games = await this.getGames(this.state.playerId, --year);
+      console.log('games are', games);
+      console.log('year is', this.state.year);
     }
 
     let {data} = await axios.put(
@@ -91,19 +79,18 @@ export default class Player extends Component {
       // data.splice(0, 9)
       games.splice(0, 2)
     );
-    // data = response.data;
 
     for (let i = 0; i < data.length; i++) {
       for (let j = 0; j < data[i].length; j++) {
         const event = data[i][j];
         const image = event.image.cuts.find(cut => {
-          if (cut.aspectRatio === '16:9' && cut.width > 500) {
-            return true;
-          }
+          return cut.aspectRatio === '16:9' && cut.width > 500;
         });
+        const video = this.videoFinder(event);
+
         const highlight = {
           image: image.src,
-          video: event.playbacks[0].url,
+          video: video.url,
           key: event.guid,
           blurb: event.blurb,
           description: event.description
@@ -118,55 +105,73 @@ export default class Player extends Component {
       loading: false,
       games,
       playerId,
-      loadingPreview: false
+      loadingPreview: false,
+      year
     });
+    if (this.state.highlights.length < 10) {
+      console.log('not enough events, grabbing more');
+      this.grabGamesHelper();
+    }
+  };
+
+  videoFinder = event => {
+    if (event.playbacks[0].width) {
+      return event.playbacks.find(playback => {
+        if (playback.width === '1280') {
+          return true;
+        }
+      });
+    } else {
+      return event.playbacks[0];
+    }
   };
 
   grabGamesHelper = async () => {
     const {highlights} = this.state;
     highlights.push('loader');
-    console.log('setting state');
-    this.setState({...this.state, highlights, loadingPreview: true});
-    console.log('state set');
-    this.grabGames(this.state.games, this.state.playerId);
+    // console.log('setting state');
+    await this.setState({...this.state, highlights, loadingPreview: true});
+    // console.log('state set');
+    await this.grabGames(this.state.games, this.state.playerId);
+  };
+
+  handleUpdate = (e, {calculations}) => {
+    console.log('handleUpdate is', calculations);
   };
 
   render() {
-    const {animation, duration, open, dimmed} = this.state;
+    const {animation, duration, open, highlights, loading} = this.state;
+    // if (highlights.length < 10) {
+    //   this.grabGamesHelper();
+    // }
     return (
       <div>
         <div>
-          {this.state.loading ? (
+          {loading ? (
             <Dimmer active inverted>
               <Loader inverted>Loading...</Loader>
             </Dimmer>
           ) : (
             <Dimmer.Dimmable as={Segment} dimmed={open}>
-              <div className="videoList">
-                {this.state.highlights.map(highlight => {
+              <Visibility
+                className="videoList"
+                fireOnMount
+                once={false}
+                onUpdate={this.handleUpdate}
+                // updateOn="repaint"
+                onBottomVisible={() => {
+                  console.log('onOnScreen');
+                  this.grabGamesHelper();
+                }}
+              >
+                {/* <div className="videoList"> */}
+                {highlights.map(highlight => {
                   return (
                     <VideoCard highlight={highlight} open={this.handleClick} />
                   );
                 })}
-              </div>
-              <Visibility
-                // continuous={true}
-                className="visibility"
-                fireOnMount={true}
-                once={false}
-                // continuous={true}
-                onBottomVisible={() => {
-                  console.log('onBottomVisible');
-                  this.grabGamesHelper();
-                }}
-                updateOn="repaint"
-                // onUpdate={() => this.grabGamesHelper()}
-                onOnScreen={() => {
-                  console.log('onOnScreen');
-                  this.grabGamesHelper();
-                }}
-              />
-
+                {/* </div> */}
+              </Visibility>
               <Dimmer active={open} />
             </Dimmer.Dimmable>
           )}
