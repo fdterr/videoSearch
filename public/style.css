@@ -52,3 +52,9 @@ form div {
 .visibility {
   height: 1px;
 }
+
+#loadButton {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}

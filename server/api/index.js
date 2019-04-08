@@ -36,6 +36,7 @@ router.get('/player/:id/games/:season', async (req, res, next) => {
     'pitching',
     req.params.season
   );
+
   res.json(games);
 });
 
@@ -52,7 +53,7 @@ router.put('/player/:id/content', async (req, res, next) => {
     );
     content.push(highlights);
   }
-  console.log('content is', content);
+  // console.log('content is', content);
   res.json(content);
 });
 
@@ -102,16 +103,21 @@ const getTeams = async () => {
 };
 
 const getPlayerGames = async (player, group, season) => {
-  const {data} = await axios.get(
-    `http://statsapi.mlb.com/api/v1/people/${player}/stats?stats=gameLog&season=${season}`
-  );
-  const splits = data.stats[0].splits;
-  const games = [];
-  splits.forEach(game => {
-    const gamePk = game.game.gamePk;
-    games.push(gamePk);
-  });
-  return games;
+  try {
+    console.log('getting games, season is', season);
+    const {data} = await axios.get(
+      `http://statsapi.mlb.com/api/v1/people/${player}/stats?stats=gameLog&season=${season}`
+    );
+    const splits = data.stats[0].splits;
+    const games = [];
+    splits.forEach(game => {
+      const gamePk = game.game.gamePk;
+      games.push(gamePk);
+    });
+    return games;
+  } catch (err) {
+    return {error: 'No games'};
+  }
 };
 
 const getPlayerContent = async (player, game) => {

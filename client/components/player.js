@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {
+  Button,
   Dimmer,
   Loader,
   Segment,
@@ -47,7 +48,6 @@ export default class Player extends Component {
   async componentDidMount() {
     const playerId = this.props.match.params.id;
     const games = await this.getGames(playerId, this.state.year);
-    console.log('mount games are', games);
     await this.grabGames(games, playerId);
   }
 
@@ -65,13 +65,16 @@ export default class Player extends Component {
     }
     let {year} = this.state;
 
-    if (!games.length && this.state.year > 2015) {
+    if (!games.length && this.state.year > 2012) {
       // this.setState()
       console.log('no games, getting games for one year behind');
       // await this.setState({...this.state, years: this.state.years - 1});
       games = await this.getGames(this.state.playerId, --year);
+      if (!games.length) {
+        games = await this.getGames(this.state.playerId, --year);
+      }
       console.log('games are', games);
-      console.log('year is', this.state.year);
+      console.log('year is', year);
     }
 
     let {data} = await axios.put(
@@ -98,7 +101,7 @@ export default class Player extends Component {
         highlights.push(highlight);
       }
     }
-    console.log('highlights are', highlights);
+    // console.log('highlights are', highlights);
     this.setState({
       ...this.state,
       highlights,
@@ -108,6 +111,7 @@ export default class Player extends Component {
       loadingPreview: false,
       year
     });
+    console.log('highlights state set');
     if (this.state.highlights.length < 10) {
       console.log('not enough events, grabbing more');
       this.grabGamesHelper();
@@ -129,21 +133,16 @@ export default class Player extends Component {
   grabGamesHelper = async () => {
     const {highlights} = this.state;
     highlights.push('loader');
-    // console.log('setting state');
     await this.setState({...this.state, highlights, loadingPreview: true});
-    // console.log('state set');
     await this.grabGames(this.state.games, this.state.playerId);
   };
 
-  handleUpdate = (e, {calculations}) => {
-    console.log('handleUpdate is', calculations);
-  };
+  // handleUpdate = (e, {calculations}) => {
+  //   console.log('handleUpdate is', calculations);
+  // };
 
   render() {
     const {animation, duration, open, highlights, loading} = this.state;
-    // if (highlights.length < 10) {
-    //   this.grabGamesHelper();
-    // }
     return (
       <div>
         <div>
@@ -157,10 +156,8 @@ export default class Player extends Component {
                 className="videoList"
                 fireOnMount
                 once={false}
-                onUpdate={this.handleUpdate}
-                // updateOn="repaint"
+                // onUpdate={this.handleUpdate}
                 onBottomVisible={() => {
-                  console.log('onOnScreen');
                   this.grabGamesHelper();
                 }}
               >
@@ -172,6 +169,9 @@ export default class Player extends Component {
                 })}
                 {/* </div> */}
               </Visibility>
+              <Button id="loadButton" onClick={this.grabGamesHelper}>
+                More
+              </Button>
               <Dimmer active={open} />
             </Dimmer.Dimmable>
           )}
