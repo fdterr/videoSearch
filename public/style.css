@@ -58,3 +58,14 @@ form div {
 .searchBar {
   width: 200px !important;
 }
+
+#homeSearch {
+  /* margin-left: auto; */
+  /* margin-right: auto; */
+  margin-top: 150px;
+  /* top: 250px; */
+  /* width: 10%; */
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+}

@@ -6,44 +6,42 @@ import {Button, Icon, Menu} from 'semantic-ui-react';
 import SearchForm from './search';
 import history from '../history';
 
-const Navbar = props => {
-  const {handleClick, isLoggedIn} = props;
-  console.log('navbar rendered');
-  // console.log('history is', props.history);
+const Navbar = () => {
   return (
-    <Menu>
+    <Menu fixed="top">
       <Menu.Item as={Button} onClick={() => history.push('')}>
         <Icon name="arrow left" />Home
       </Menu.Item>
       <Menu.Item as={SearchForm} />
     </Menu>
-    // </div>
   );
 };
 
-/**
- * CONTAINER
- */
-const mapState = state => {
-  return {
-    isLoggedIn: !!state.user.id
-  };
-};
+export default Navbar;
 
-const mapDispatch = dispatch => {
-  return {
-    handleClick() {
-      dispatch(logout());
-    }
-  };
-};
+// /**
+//  * CONTAINER
+//  */
+// const mapState = state => {
+//   return {
+//     isLoggedIn: !!state.user.id
+//   };
+// };
 
-export default connect(mapState, mapDispatch)(Navbar);
+// const mapDispatch = dispatch => {
+//   return {
+//     handleClick() {
+//       dispatch(logout());
+//     }
+//   };
+// };
 
-/**
- * PROP TYPES
- */
-Navbar.propTypes = {
-  handleClick: PropTypes.func.isRequired,
-  isLoggedIn: PropTypes.bool.isRequired
-};
+// export default connect(mapState, mapDispatch)(Navbar);
+
+// /**
+//  * PROP TYPES
+//  */
+// Navbar.propTypes = {
+//   handleClick: PropTypes.func.isRequired,
+//   isLoggedIn: PropTypes.bool.isRequired
+// };
