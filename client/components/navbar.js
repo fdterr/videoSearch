@@ -1,7 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {Link} from 'react-router-dom';
 import {Button, Icon, Menu} from 'semantic-ui-react';
 import SearchForm from './search';
 import history from '../history';
