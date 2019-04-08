@@ -61,21 +61,23 @@ export default class SearchForm extends Component {
     const {isLoading, value, results} = this.state;
     // console.log('this.state.source', this.state.source);
 
-    return (
-      <div className="search">
-        {!!this.state.source && (
-          <Search
-            loading={isLoading}
-            onResultSelect={this.handleResultSelect}
-            onSearchChange={_.debounce(this.handleSearchChange, 500, {
-              leading: true
-            })}
-            results={results}
-            value={value}
-            {...this.props}
-          />
-        )}
+    return this.state.source ? (
+      <div className="searchBar">
+        <Search
+          // className="searchBar"
+          loading={isLoading}
+          onResultSelect={this.handleResultSelect}
+          onSearchChange={_.debounce(this.handleSearchChange, 500, {
+            leading: true
+          })}
+          results={results}
+          value={value}
+          {...this.props}
+        />
       </div>
+    ) : (
+      <div />
     );
   }
+  v;
 }

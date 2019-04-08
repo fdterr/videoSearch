@@ -177,11 +177,6 @@ export default class Player extends Component {
             </Dimmer>
           ) : (
             <Dimmer.Dimmable as={Segment} dimmed={open}>
-              {/* <Link to="">
-                <Button id="homeButton">
-                  <Icon name="arrow left" />Back
-                </Button>
-              </Link> */}
               <Visibility
                 className="videoList"
                 fireOnMount
@@ -191,13 +186,11 @@ export default class Player extends Component {
                   this.grabGamesHelper();
                 }}
               >
-                {/* <div className="videoList"> */}
                 {highlights.map(highlight => {
                   return (
                     <VideoCard highlight={highlight} open={this.handleClick} />
                   );
                 })}
-                {/* </div> */}
               </Visibility>
               <Button id="loadButton" onClick={this.grabGamesHelper}>
                 More

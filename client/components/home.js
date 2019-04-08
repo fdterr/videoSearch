@@ -23,7 +23,7 @@ import SearchForm from './search';
 const Home = props => {
   console.log('home rendered');
   return (
-    <div>
+    <div className="searchBar">
       <SearchForm history={props.history} />
     </div>
   );

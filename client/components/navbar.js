@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {Button, Icon, Menu} from 'semantic-ui-react';
 import SearchForm from './search';
-// import history from '../history';
+import history from '../history';
 
 const Navbar = props => {
   const {handleClick, isLoggedIn} = props;
@@ -12,16 +12,10 @@ const Navbar = props => {
   // console.log('history is', props.history);
   return (
     <Menu>
-      <Link to="">
-        <Menu.Item>
-          <Button id="homeButton">
-            <Icon name="arrow left" />Back
-          </Button>
-        </Menu.Item>
-      </Link>
-      <Menu.Item>
-        <SearchForm />
+      <Menu.Item as={Button} onClick={() => history.push('')}>
+        <Icon name="arrow left" />Home
       </Menu.Item>
+      <Menu.Item as={SearchForm} />
     </Menu>
     // </div>
   );
