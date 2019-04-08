@@ -1,15 +1,18 @@
 import React, {Component} from 'react';
+import {Navbar} from '../components';
 import {
   Button,
   Dimmer,
+  Embed,
+  Icon,
   Loader,
   Segment,
-  Embed,
   TransitionablePortal,
   Visibility
 } from 'semantic-ui-react';
 import axios from 'axios';
 import VideoCard from './videoCard';
+import {Link} from 'react-router-dom';
 
 export default class Player extends Component {
   constructor() {
@@ -51,6 +54,12 @@ export default class Player extends Component {
     await this.grabGames(games, playerId);
   }
 
+  updatePlayer = async () => {
+    const playerId = this.props.match.params.id;
+    const games = await this.getGames(playerId, this.state.year);
+    await this.grabGames(games, playerId);
+  };
+
   getGames = async (playerId, year) => {
     let {data} = await axios.get(`/api/player/${playerId}/games/${year}`);
     return data;
@@ -66,9 +75,7 @@ export default class Player extends Component {
     let {year} = this.state;
 
     if (!games.length && this.state.year > 2012) {
-      // this.setState()
       console.log('no games, getting games for one year behind');
-      // await this.setState({...this.state, years: this.state.years - 1});
       games = await this.getGames(this.state.playerId, --year);
       if (!games.length) {
         games = await this.getGames(this.state.playerId, --year);
@@ -79,7 +86,6 @@ export default class Player extends Component {
 
     let {data} = await axios.put(
       `/api/player/${playerId}/content`,
-      // data.splice(0, 9)
       games.splice(0, 2)
     );
 
@@ -111,7 +117,7 @@ export default class Player extends Component {
       loadingPreview: false,
       year
     });
-    console.log('highlights state set');
+    // console.log('highlights state set');
     if (this.state.highlights.length < 10) {
       console.log('not enough events, grabbing more');
       this.grabGamesHelper();
@@ -137,14 +143,33 @@ export default class Player extends Component {
     await this.grabGames(this.state.games, this.state.playerId);
   };
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log('props', this.props);
+    console.log('prevProps', prevProps);
+
+    if (this.props.match.params.id !== prevProps.match.params.id) {
+      this.setState({...this.state, highlights: [], loading: true});
+      this.updatePlayer();
+    }
+  }
+
   // handleUpdate = (e, {calculations}) => {
   //   console.log('handleUpdate is', calculations);
   // };
 
   render() {
-    const {animation, duration, open, highlights, loading} = this.state;
+    const {
+      animation,
+      duration,
+      open,
+      highlights,
+      loading
+      // playerId
+    } = this.state;
+    const playerId = this.props.match.params.id;
     return (
-      <div>
+      <div key={playerId}>
+        <Navbar />
         <div>
           {loading ? (
             <Dimmer active inverted>
@@ -152,6 +177,11 @@ export default class Player extends Component {
             </Dimmer>
           ) : (
             <Dimmer.Dimmable as={Segment} dimmed={open}>
+              {/* <Link to="">
+                <Button id="homeButton">
+                  <Icon name="arrow left" />Back
+                </Button>
+              </Link> */}
               <Visibility
                 className="videoList"
                 fireOnMount
