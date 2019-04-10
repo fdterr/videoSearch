@@ -144,9 +144,6 @@ export default class Player extends Component {
   };
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log('props', this.props);
-    console.log('prevProps', prevProps);
-
     if (this.props.match.params.id !== prevProps.match.params.id) {
       this.setState({...this.state, highlights: [], loading: true});
       this.updatePlayer();
@@ -176,27 +173,32 @@ export default class Player extends Component {
               <Loader inverted>Loading...</Loader>
             </Dimmer>
           ) : (
-            <Dimmer.Dimmable as={Segment} dimmed={open}>
-              <Visibility
-                className="videoList"
-                fireOnMount
-                once={false}
-                // onUpdate={this.handleUpdate}
-                onBottomVisible={() => {
-                  this.grabGamesHelper();
-                }}
-              >
-                {highlights.map(highlight => {
-                  return (
-                    <VideoCard highlight={highlight} open={this.handleClick} />
-                  );
-                })}
-              </Visibility>
-              <Button id="loadButton" onClick={this.grabGamesHelper}>
-                More
-              </Button>
-              <Dimmer active={open} />
-            </Dimmer.Dimmable>
+            <div className="dimmer">
+              <Dimmer.Dimmable as={Segment} dimmed={open}>
+                <Visibility
+                  className="videoList"
+                  fireOnMount
+                  once={false}
+                  // onUpdate={this.handleUpdate}
+                  onBottomVisible={() => {
+                    this.grabGamesHelper();
+                  }}
+                >
+                  {highlights.map(highlight => {
+                    return (
+                      <VideoCard
+                        highlight={highlight}
+                        open={this.handleClick}
+                      />
+                    );
+                  })}
+                </Visibility>
+                <Button id="loadButton" onClick={this.grabGamesHelper}>
+                  More
+                </Button>
+                <Dimmer active={open} />
+              </Dimmer.Dimmable>
+            </div>
           )}
         </div>
         <TransitionablePortal

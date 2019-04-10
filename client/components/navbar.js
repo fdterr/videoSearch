@@ -5,40 +5,17 @@ import history from '../history';
 
 const Navbar = () => {
   return (
-    <Menu fixed="top">
+    <Menu fixed="top" size="small">
       <Menu.Item as={Button} onClick={() => history.push('')}>
         <Icon name="arrow left" />Home
       </Menu.Item>
-      <Menu.Item as={SearchForm} />
+
+      {/* <Menu.Item as={SearchForm} /> */}
+      <Menu.Item>
+        <SearchForm />
+      </Menu.Item>
     </Menu>
   );
 };
 
 export default Navbar;
-
-// /**
-//  * CONTAINER
-//  */
-// const mapState = state => {
-//   return {
-//     isLoggedIn: !!state.user.id
-//   };
-// };
-
-// const mapDispatch = dispatch => {
-//   return {
-//     handleClick() {
-//       dispatch(logout());
-//     }
-//   };
-// };
-
-// export default connect(mapState, mapDispatch)(Navbar);
-
-// /**
-//  * PROP TYPES
-//  */
-// Navbar.propTypes = {
-//   handleClick: PropTypes.func.isRequired,
-//   isLoggedIn: PropTypes.bool.isRequired
-// };

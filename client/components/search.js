@@ -51,30 +51,23 @@ export default class SearchForm extends Component {
 
   async componentDidMount() {
     const {data} = await axios.get('/api/players');
-    // console.log('data is', data);
     source = makeSource(data);
-    // console.log('source is', source);
     this.setState({...this.state, source});
   }
 
   render() {
     const {isLoading, value, results} = this.state;
-    // console.log('this.state.source', this.state.source);
 
     return this.state.source ? (
-      <div className="searchBar">
-        <Search
-          // className="searchBar"
-          loading={isLoading}
-          onResultSelect={this.handleResultSelect}
-          onSearchChange={_.debounce(this.handleSearchChange, 500, {
-            leading: true
-          })}
-          results={results}
-          value={value}
-          {...this.props}
-        />
-      </div>
+      <Search
+        loading={isLoading}
+        onResultSelect={this.handleResultSelect}
+        onSearchChange={_.debounce(this.handleSearchChange, 500, {
+          leading: true
+        })}
+        results={results}
+        value={value}
+      />
     ) : (
       <div />
     );

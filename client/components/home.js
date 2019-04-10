@@ -20,12 +20,13 @@ const Home = props => {
           className="footer"
           fixed="bottom"
           borderless
-          style={{display: 'flex', 'justify-content': 'center'}}
+          style={{display: 'flex', justifyContent: 'center'}}
         >
           <Menu.Item
             onClick={() => (window.location = 'https://github.com/fdterr')}
+            style={{width: '100%', display: 'flex', justifyContent: 'center'}}
           >
-            by Rick Terry
+            videoSearch by Rick Terry
           </Menu.Item>
         </Menu>
       </div>

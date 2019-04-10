@@ -43,14 +43,6 @@ form div {
   right: 10px;
 }
 
-/* #homeButton {
-  position: fixed;
-} */
-
-.menuBar {
-  display: flex !important;
-}
-
 .searchBar {
   width: 200px !important;
 }
@@ -66,4 +58,8 @@ form div {
   align-items: center;
   /* justify-content: center; */
   /* height: 100vh; */
+}
+
+.dimmer {
+  margin-top: 55px;
 }
