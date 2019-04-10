@@ -172,7 +172,7 @@ export default class Player extends Component {
         <Navbar />
         <div>
           {loading ? (
-            <Dimmer active inverted>
+            <Dimmer inverted>
               <Loader inverted>Loading...</Loader>
             </Dimmer>
           ) : (

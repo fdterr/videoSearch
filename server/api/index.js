@@ -58,6 +58,7 @@ router.put('/player/:id/content', async (req, res, next) => {
 });
 
 router.get('/createList', async (req, res, next) => {
+  console.log('creating list');
   const teams = await getTeams();
   const players = [];
   for (let i = 0; i < teams.length; i++) {
@@ -74,6 +75,7 @@ router.get('/createList', async (req, res, next) => {
         team: teams[i],
         season: 2019
       };
+      players.push(newPlayer);
 
       await Player.findOrCreate({
         where: {playerId: player.person.id},
@@ -81,6 +83,7 @@ router.get('/createList', async (req, res, next) => {
       });
     });
   }
+  res.status(201).send(players);
 });
 
 router.use((req, res, next) => {
@@ -99,6 +102,7 @@ const getTeams = async () => {
       teams.push(team.id);
     }
   });
+  console.log('got teams');
   return teams;
 };
 
