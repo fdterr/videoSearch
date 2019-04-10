@@ -62,12 +62,13 @@ export default class Player extends Component {
 
   getGames = async (playerId, year) => {
     let {data} = await axios.get(`/api/player/${playerId}/games/${year}`);
+    data.reverse();
     return data;
   };
 
   grabGames = async (games, playerId) => {
-    console.log('games are', games);
-    console.log('year is', this.state.year);
+    // console.log('games are', games);
+    // console.log('year is', this.state.year);
     const {highlights} = this.state;
     while (highlights[highlights.length - 1] === 'loader') {
       highlights.pop();
@@ -102,12 +103,12 @@ export default class Player extends Component {
           video: video.url,
           key: event.guid,
           blurb: event.blurb,
-          description: event.description
+          description: event.description,
+          date: event.date
         };
         highlights.push(highlight);
       }
     }
-    // console.log('highlights are', highlights);
     this.setState({
       ...this.state,
       highlights,
@@ -117,7 +118,6 @@ export default class Player extends Component {
       loadingPreview: false,
       year
     });
-    // console.log('highlights state set');
     if (this.state.highlights.length < 10) {
       console.log('not enough events, grabbing more');
       this.grabGamesHelper();
@@ -164,6 +164,7 @@ export default class Player extends Component {
       // playerId
     } = this.state;
     const playerId = this.props.match.params.id;
+    let keyIndex = 0;
     return (
       <div key={playerId}>
         <Navbar />
@@ -189,6 +190,7 @@ export default class Player extends Component {
                       <VideoCard
                         highlight={highlight}
                         open={this.handleClick}
+                        key={keyIndex++}
                       />
                     );
                   })}

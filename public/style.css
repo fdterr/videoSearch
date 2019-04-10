@@ -19,8 +19,6 @@ form div {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  /* align-items: center; */
-  /* align-content: space-around; */
   margin-left: auto;
   margin-right: auto;
   width: 95vw;
@@ -48,18 +46,12 @@ form div {
 }
 
 #homeSearch {
-  /* margin-left: auto; */
-  /* margin-right: auto; */
   margin-top: 150px;
-  /* top: 250px; */
-  /* width: 10%; */
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: center; */
-  /* height: 100vh; */
 }
 
 .dimmer {
-  margin-top: 55px;
+  margin-top: 50px;
 }
