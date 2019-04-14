@@ -31,24 +31,25 @@ router.get('/players', async (req, res, next) => {
 });
 
 router.get('/player/:id/games/:season', async (req, res, next) => {
-  const games = await getPlayerGames(
-    req.params.id,
-    'pitching',
-    req.params.season
-  );
+  try {
+    const games = await getPlayerGames(
+      req.params.id,
+      'pitching',
+      req.params.season
+    );
 
-  res.json(games);
+    res.json(games);
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.put('/player/:id/content', async (req, res, next) => {
-  // const games = await getPlayerGames(req.params.id, 'pitching', '2018');
   const games = req.body;
-  console.log('games are', games);
-  console.log('params are', req.params.id);
   let content = [];
   for (let i = 0; i < games.length; i++) {
     const {fullName} = await getPlayer(req.params.id);
-    console.log('fullName is', fullName);
+    // console.log('fullName is', fullName);
     const highlights = await getPlayerContent(
       // await getPlayer(req.params.id).fullName,
       fullName,
@@ -56,7 +57,8 @@ router.put('/player/:id/content', async (req, res, next) => {
     );
     content.push(highlights);
   }
-  // console.log('content is', content);
+  // console.log('content is', content[0].length, content[1].length);
+  console.log('content is', content);
   res.json(content);
 });
 
@@ -91,12 +93,6 @@ router.get('/createList', async (req, res, next) => {
   res.status(201).send(players);
 });
 
-router.use((req, res, next) => {
-  const error = new Error('Not Found');
-  error.status = 404;
-  next(error);
-});
-
 const getTeams = async () => {
   const {data} = await axios.get('http://statsapi.mlb.com/api/v1/teams');
   const allTeams = data.teams;
@@ -111,21 +107,59 @@ const getTeams = async () => {
   return teams;
 };
 
+router.use((req, res, next) => {
+  const error = new Error('Not Found');
+  error.status = 404;
+  next(error);
+});
+
 const getPlayerGames = async (player, group, season) => {
   try {
-    console.log('getting games, season is', season);
-    const {data} = await axios.get(
-      `http://statsapi.mlb.com/api/v1/people/${player}/stats?stats=gameLog&season=${season}`
-    );
-    const splits = data.stats[0].splits;
     const games = [];
-    splits.forEach(game => {
-      const gamePk = game.game.gamePk;
-      games.push(gamePk);
-    });
+    console.log('getting games of player', player);
+    const debutYear = +await playerDebut(player);
+    console.log('player debut year is', debutYear);
+    while (season >= debutYear) {
+      const seasonGames = [];
+      console.log('getting games, season is', season);
+      try {
+        const {data} = await axios.get(
+          `http://statsapi.mlb.com/api/v1/people/${player}/stats?stats=gameLog&season=${season--}`
+        );
+        const splits = data.stats[0].splits;
+        splits.forEach(game => {
+          const gamePk = game.game.gamePk;
+          seasonGames.push(gamePk);
+        });
+        seasonGames.reverse();
+        games.push.apply(games, seasonGames);
+        // console.log('seasonGames are', seasonGames);
+        // season--;
+      } catch (err) {
+        console.error(err);
+      }
+    }
     return games;
   } catch (err) {
     return {error: 'No games'};
+  }
+};
+
+const allPlayerGames = async player => {
+  try {
+    //something
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const playerDebut = async player => {
+  try {
+    console.log('trying to find player', player);
+    const {debutDate} = await Player.findOne({where: {playerId: player}});
+    return debutDate.split('-')[0];
+  } catch (err) {
+    console.error(err);
   }
 };
 

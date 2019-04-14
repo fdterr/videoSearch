@@ -60,3 +60,7 @@ form div {
   /* margin-bottom: 5px; */
   /* padding-bottom: 5px; */
 }
+
+.videoPlayer {
+  top: 5% !important;
+}

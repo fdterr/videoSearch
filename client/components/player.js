@@ -63,7 +63,7 @@ export default class Player extends Component {
   getGames = async (playerId, year) => {
     let {data} = await axios.get(`/api/player/${playerId}/games/${year}`);
     if (data.length) {
-      data.reverse();
+      // data.reverse();
       return data;
     } else {
       return [];
@@ -91,14 +91,14 @@ export default class Player extends Component {
 
     let {data} = await axios.put(
       `/api/player/${playerId}/content`,
-      games.splice(0, 2)
+      games.splice(0, 4)
     );
 
     for (let i = 0; i < data.length; i++) {
       for (let j = 0; j < data[i].length; j++) {
         const event = data[i][j];
         const image = event.image.cuts.find(cut => {
-          return cut.aspectRatio === '16:9' && cut.width > 500;
+          return cut.aspectRatio === '16:9' && cut.width > 800;
         });
         const video = this.videoFinder(event);
 
@@ -113,6 +113,7 @@ export default class Player extends Component {
         highlights.push(highlight);
       }
     }
+    // console.log('got two games: data length', highlights.length);
 
     await this.setState({
       ...this.state,
@@ -125,6 +126,9 @@ export default class Player extends Component {
     });
     if (this.state.highlights.length < 10) {
       this.grabGamesHelper();
+    } else if (data[0].length + data[1].length < 1) {
+      console.log('got no highlights from these games');
+      await this.grabGamesHelper();
     }
   };
 
@@ -141,7 +145,7 @@ export default class Player extends Component {
   };
 
   grabGamesHelper = async () => {
-    console.log('helper fired');
+    // console.log('helper fired');
     if (!this.state.loadingPreview) {
       const {highlights} = this.state;
       highlights.push('loader');
@@ -185,8 +189,7 @@ export default class Player extends Component {
                   className="videoList"
                   fireOnMount
                   once={false}
-                  // onUpdate={this.handleUpdate}
-                  // as={Segment}
+                  onUpdate={this.handleUpdate}
                   onBottomVisible={() => {
                     this.grabGamesHelper();
                   }}
@@ -222,6 +225,7 @@ export default class Player extends Component {
               zIndex: 1000,
               width: '75%'
             }}
+            className="videoPlayer"
           >
             <Embed
               icon="right circle arrow"
