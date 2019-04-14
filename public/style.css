@@ -53,5 +53,7 @@ form div {
 }
 
 .dimmer {
-  margin-top: 50px;
+  margin-top: 55px;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
 }

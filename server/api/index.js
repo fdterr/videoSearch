@@ -47,8 +47,11 @@ router.put('/player/:id/content', async (req, res, next) => {
   console.log('params are', req.params.id);
   let content = [];
   for (let i = 0; i < games.length; i++) {
+    const {fullName} = await getPlayer(req.params.id);
+    console.log('fullName is', fullName);
     const highlights = await getPlayerContent(
-      await getPlayerName(req.params.id),
+      // await getPlayer(req.params.id).fullName,
+      fullName,
       games[i]
     );
     content.push(highlights);
@@ -69,11 +72,13 @@ router.get('/createList', async (req, res, next) => {
     const roster = data.roster;
 
     await roster.forEach(async player => {
+      const {debutDate} = await getPlayer(player.person.id);
       const newPlayer = {
         playerId: player.person.id,
         fullName: player.person.fullName,
         team: teams[i],
-        season: 2019
+        season: 2019,
+        debutDate
       };
       players.push(newPlayer);
 
@@ -125,6 +130,7 @@ const getPlayerGames = async (player, group, season) => {
 };
 
 const getPlayerContent = async (player, game) => {
+  // console.log('looking for name', player);
   let highlights = [];
 
   const {data} = await axios.get(
@@ -146,9 +152,12 @@ const getPlayerContent = async (player, game) => {
   return highlights;
 };
 
-const getPlayerName = async playerId => {
+const getPlayer = async playerId => {
   const {data} = await axios.get(
     `http://statsapi.mlb.com/api/v1/people/${playerId}`
   );
-  return data.people[0].fullName;
+  return {
+    fullName: data.people[0].fullName,
+    debutDate: data.people[0].mlbDebutDate
+  };
 };

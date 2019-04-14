@@ -31,8 +31,8 @@ export default class Player extends Component {
       loadingPreview: false,
       year: 2019
     };
-    this.grabGames = this.grabGames.bind(this);
-    this.grabGamesHelper = this.grabGamesHelper.bind(this);
+    // this.grabGames = this.grabGames.bind(this);
+    // this.grabGamesHelper = this.grabGamesHelper.bind(this);
   }
 
   handleClick = (video, image) => {
@@ -62,8 +62,12 @@ export default class Player extends Component {
 
   getGames = async (playerId, year) => {
     let {data} = await axios.get(`/api/player/${playerId}/games/${year}`);
-    data.reverse();
-    return data;
+    if (data.length) {
+      data.reverse();
+      return data;
+    } else {
+      return [];
+    }
   };
 
   grabGames = async (games, playerId) => {
@@ -109,7 +113,8 @@ export default class Player extends Component {
         highlights.push(highlight);
       }
     }
-    this.setState({
+
+    await this.setState({
       ...this.state,
       highlights,
       loading: false,
@@ -119,7 +124,6 @@ export default class Player extends Component {
       year
     });
     if (this.state.highlights.length < 10) {
-      console.log('not enough events, grabbing more');
       this.grabGamesHelper();
     }
   };
@@ -137,32 +141,33 @@ export default class Player extends Component {
   };
 
   grabGamesHelper = async () => {
-    const {highlights} = this.state;
-    highlights.push('loader');
-    await this.setState({...this.state, highlights, loadingPreview: true});
-    await this.grabGames(this.state.games, this.state.playerId);
+    console.log('helper fired');
+    if (!this.state.loadingPreview) {
+      const {highlights} = this.state;
+      highlights.push('loader');
+      await this.setState({...this.state, highlights, loadingPreview: true});
+      await this.grabGames(this.state.games, this.state.playerId);
+    }
   };
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  async componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.props.match.params.id !== prevProps.match.params.id) {
-      this.setState({...this.state, highlights: [], loading: true});
+      await this.setState({
+        ...this.state,
+        highlights: [],
+        loading: true,
+        year: 2019
+      });
       this.updatePlayer();
     }
   }
 
-  // handleUpdate = (e, {calculations}) => {
-  //   console.log('handleUpdate is', calculations);
-  // };
+  handleUpdate = (e, {calculations}) => {
+    console.log('handleUpdate is', calculations);
+  };
 
   render() {
-    const {
-      animation,
-      duration,
-      open,
-      highlights,
-      loading
-      // playerId
-    } = this.state;
+    const {animation, duration, open, highlights, loading} = this.state;
     const playerId = this.props.match.params.id;
     let keyIndex = 0;
     return (
@@ -175,12 +180,13 @@ export default class Player extends Component {
             </Dimmer>
           ) : (
             <div className="dimmer">
-              <Dimmer.Dimmable as={Segment} dimmed={open}>
+              <Dimmer.Dimmable dimmed={open}>
                 <Visibility
                   className="videoList"
                   fireOnMount
                   once={false}
                   // onUpdate={this.handleUpdate}
+                  // as={Segment}
                   onBottomVisible={() => {
                     this.grabGamesHelper();
                   }}

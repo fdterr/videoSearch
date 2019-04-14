@@ -16,7 +16,7 @@ const VideoCard = props => {
           }
         />
       ) : (
-        <Card className="videoPlaceholder">
+        <Card className="videoPlaceholder" header=" ">
           <Dimmer active inverted>
             <Loader inverted>Loading...</Loader>
           </Dimmer>

@@ -17,6 +17,10 @@ const Player = db.define('player', {
   season: {
     type: Sequelize.INTEGER,
     allowNull: true
+  },
+  debutDate: {
+    type: Sequelize.STRING,
+    allowNull: true
   }
 });
 
