@@ -49,6 +49,7 @@ export default class Player extends Component {
   };
 
   async componentDidMount() {
+    console.log('component mounted');
     const playerId = this.props.match.params.id;
     const games = await this.getGames(playerId, this.state.year);
     await this.grabGames(games, playerId);
@@ -71,7 +72,7 @@ export default class Player extends Component {
   };
 
   grabGames = async (games, playerId) => {
-    // console.log('games are', games);
+    console.log('games are', games);
     // console.log('year is', this.state.year);
     const {highlights} = this.state;
     while (highlights[highlights.length - 1] === 'loader') {
@@ -79,15 +80,15 @@ export default class Player extends Component {
     }
     let {year} = this.state;
 
-    if (!games.length && this.state.year > 2012) {
-      console.log('no games, getting games for one year behind');
-      games = await this.getGames(this.state.playerId, --year);
-      if (!games.length) {
-        games = await this.getGames(this.state.playerId, --year);
-      }
-      console.log('games are', games);
-      console.log('year is', year);
-    }
+    // if (!games.length && this.state.year > 2012) {
+    //   console.log('no games, getting games for one year behind');
+    //   games = await this.getGames(this.state.playerId, --year);
+    //   if (!games.length) {
+    //     games = await this.getGames(this.state.playerId, --year);
+    //   }
+    //   console.log('games are', games);
+    //   console.log('year is', year);
+    // }
 
     let {data} = await axios.put(
       `/api/player/${playerId}/content`,
@@ -125,10 +126,11 @@ export default class Player extends Component {
       year
     });
     if (this.state.highlights.length < 10) {
+      console.log('initial grab not enough to scroll');
       this.grabGamesHelper();
     } else if (data[0].length + data[1].length < 1) {
       console.log('got no highlights from these games');
-      await this.grabGamesHelper();
+      this.grabGamesHelper();
     }
   };
 
@@ -155,19 +157,20 @@ export default class Player extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log('beg. cDU');
+    // console.log('beg. cDU');
+    console.log('new state is', this.state);
     if (this.props.match.params.id !== prevProps.match.params.id) {
       await this.setState({
         ...this.state,
         highlights: [],
         loading: true,
-        year: 2019
+        year: 2019,
+        playerId: this.props.match.params.id
       });
       console.log('updated state for update player', this.state.highlights);
-      await this.updatePlayer();
-      // history.push(`/players/video/${this.props.match.params.id}`);
+      this.updatePlayer();
     }
-    console.log('end. cDU');
+    // console.log('end. cDU');
   }
 
   handleUpdate = (e, {calculations}) => {
