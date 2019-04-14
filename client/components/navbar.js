@@ -5,7 +5,7 @@ import history from '../history';
 
 const Navbar = () => {
   return (
-    <Menu fixed="top" size="tiny">
+    <Menu id="menuBar" fixed="top" size="tiny">
       <Menu.Item as={Button} onClick={() => history.push('')}>
         <Icon name="arrow left" />Home
       </Menu.Item>

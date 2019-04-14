@@ -155,6 +155,7 @@ export default class Player extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log('beg. cDU');
     if (this.props.match.params.id !== prevProps.match.params.id) {
       await this.setState({
         ...this.state,
@@ -162,8 +163,11 @@ export default class Player extends Component {
         loading: true,
         year: 2019
       });
-      this.updatePlayer();
+      console.log('updated state for update player', this.state.highlights);
+      await this.updatePlayer();
+      // history.push(`/players/video/${this.props.match.params.id}`);
     }
+    console.log('end. cDU');
   }
 
   handleUpdate = (e, {calculations}) => {
@@ -172,14 +176,15 @@ export default class Player extends Component {
 
   render() {
     const {animation, duration, open, highlights, loading} = this.state;
-    const playerId = this.props.match.params.id;
+    console.log('rendered, highlights are', highlights);
+    // const playerId = this.props.match.params.id;
     let keyIndex = 0;
     return (
-      <div key={playerId}>
+      <div key={this.props.match.params.id}>
         <Navbar />
         <div>
           {loading ? (
-            <Dimmer inverted>
+            <Dimmer active inverted>
               <Loader inverted>Loading...</Loader>
             </Dimmer>
           ) : (
@@ -189,7 +194,7 @@ export default class Player extends Component {
                   className="videoList"
                   fireOnMount
                   once={false}
-                  onUpdate={this.handleUpdate}
+                  // onUpdate={this.handleUpdate}
                   onBottomVisible={() => {
                     this.grabGamesHelper();
                   }}
