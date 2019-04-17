@@ -8,6 +8,9 @@ const db = require('./db');
 const sessionStore = new SequelizeStore({db});
 const PORT = process.env.PORT || 8080;
 const app = express();
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
 module.exports = app;
 
 // This is a global Mocha hook, used for resource cleanup.
@@ -15,6 +18,12 @@ module.exports = app;
 if (process.env.NODE_ENV === 'test') {
   after('close the session store', () => sessionStore.stopExpiringSessions());
 }
+
+// SSL Certificate:
+const options = {
+  key: fs.readFileSync(__dirname + '/private.key', 'utf8'),
+  cert: fs.readFileSync(__dirname + '/certificate.crt', 'utf8')
+};
 
 const createApp = () => {
   // logging middleware
@@ -68,9 +77,9 @@ const createApp = () => {
 
 const startListening = () => {
   // start listening (and create a 'server' object representing our server)
-  const server = app.listen(PORT, () =>
-    console.log(`Mixing it up on port ${PORT}`)
-  );
+  const server = https
+    .createServer(options, app)
+    .listen(PORT, () => console.log(`Mixing it up on port ${PORT}`));
 
   // set up our socket control center
 };

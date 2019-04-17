@@ -9,7 +9,7 @@ const databaseName =
 //   {
 //     logging: false
 //   }
-// )
+// );
 
 const username = process.env.user_name;
 const password = process.env.password;
