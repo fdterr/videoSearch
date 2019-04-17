@@ -4,7 +4,8 @@ import {
   Button,
   Dimmer,
   Embed,
-  Icon,
+  // Icon,
+  Divider,
   Loader,
   Segment,
   TransitionablePortal,
@@ -24,6 +25,7 @@ export default class Player extends Component {
       open: false,
       video: '',
       image: '',
+      description: '',
       dimmed: false,
       games: [],
       highlights: [],
@@ -31,16 +33,15 @@ export default class Player extends Component {
       loadingPreview: false,
       year: 2019
     };
-    // this.grabGames = this.grabGames.bind(this);
-    // this.grabGamesHelper = this.grabGamesHelper.bind(this);
   }
 
-  handleClick = (video, image) => {
+  handleClick = (video, image, description) => {
     this.setState({
       ...this.state,
       open: !this.state.open,
       video: !this.state.open ? video : undefined,
-      image: !this.state.open ? image : undefined
+      image: !this.state.open ? image : undefined,
+      description: !this.state.open ? description : undefined
     });
   };
 
@@ -49,7 +50,6 @@ export default class Player extends Component {
   };
 
   async componentDidMount() {
-    console.log('component mounted');
     const playerId = this.props.match.params.id;
     const games = await this.getGames(playerId, this.state.year);
     await this.grabGames(games, playerId);
@@ -64,7 +64,6 @@ export default class Player extends Component {
   getGames = async (playerId, year) => {
     let {data} = await axios.get(`/api/player/${playerId}/games/${year}`);
     if (data.length) {
-      // data.reverse();
       return data;
     } else {
       return [];
@@ -73,22 +72,11 @@ export default class Player extends Component {
 
   grabGames = async (games, playerId) => {
     console.log('games are', games);
-    // console.log('year is', this.state.year);
     const {highlights} = this.state;
     while (highlights[highlights.length - 1] === 'loader') {
       highlights.pop();
     }
     let {year} = this.state;
-
-    // if (!games.length && this.state.year > 2012) {
-    //   console.log('no games, getting games for one year behind');
-    //   games = await this.getGames(this.state.playerId, --year);
-    //   if (!games.length) {
-    //     games = await this.getGames(this.state.playerId, --year);
-    //   }
-    //   console.log('games are', games);
-    //   console.log('year is', year);
-    // }
 
     let {data} = await axios.put(
       `/api/player/${playerId}/content`,
@@ -114,7 +102,6 @@ export default class Player extends Component {
         highlights.push(highlight);
       }
     }
-    // console.log('got two games: data length', highlights.length);
 
     await this.setState({
       ...this.state,
@@ -126,10 +113,8 @@ export default class Player extends Component {
       year
     });
     if (this.state.highlights.length < 10) {
-      console.log('initial grab not enough to scroll');
       this.grabGamesHelper();
     } else if (data[0].length + data[1].length < 1) {
-      console.log('got no highlights from these games');
       this.grabGamesHelper();
     }
   };
@@ -147,7 +132,6 @@ export default class Player extends Component {
   };
 
   grabGamesHelper = async () => {
-    // console.log('helper fired');
     if (!this.state.loadingPreview) {
       const {highlights} = this.state;
       highlights.push('loader');
@@ -180,7 +164,6 @@ export default class Player extends Component {
   render() {
     const {animation, duration, open, highlights, loading} = this.state;
     console.log('rendered, highlights are', highlights);
-    // const playerId = this.props.match.params.id;
     let keyIndex = 0;
     return (
       <div key={this.props.match.params.id}>
@@ -242,6 +225,9 @@ export default class Player extends Component {
               aspectRatio="16:9"
               // active={true}
             />
+            <Divider />
+            {this.state.description}
+            {/* <Segment>{this.state.description}</Segment> */}
           </Segment>
         </TransitionablePortal>
       </div>
