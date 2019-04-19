@@ -19,12 +19,6 @@ if (process.env.NODE_ENV === 'test') {
   after('close the session store', () => sessionStore.stopExpiringSessions());
 }
 
-// SSL Certificate:
-const options = {
-  key: fs.readFileSync(__dirname + '/private.key', 'utf8'),
-  cert: fs.readFileSync(__dirname + '/certificate.crt', 'utf8')
-};
-
 const createApp = () => {
   // logging middleware
   app.use(morgan('dev'));
@@ -77,9 +71,9 @@ const createApp = () => {
 
 const startListening = () => {
   // start listening (and create a 'server' object representing our server)
-  const server = https
-    .createServer(options, app)
-    .listen(PORT, () => console.log(`Mixing it up on port ${PORT}`));
+  const server = app.listen(PORT, () =>
+    console.log(`Mixing it up on port ${PORT}`)
+  );
 
   // set up our socket control center
 };
