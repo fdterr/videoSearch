@@ -49,12 +49,8 @@ router.put('/player/:id/content', async (req, res, next) => {
   let content = [];
   for (let i = 0; i < games.length; i++) {
     const {fullName} = await getPlayer(req.params.id);
-    // console.log('fullName is', fullName);
-    const highlights = await getPlayerContent(
-      // await getPlayer(req.params.id).fullName,
-      fullName,
-      games[i]
-    );
+    const lastName = fullName.split(' ').pop();
+    const highlights = await getPlayerContent(lastName, games[i]);
     content.push(highlights);
   }
   // console.log('content is', content[0].length, content[1].length);
@@ -175,7 +171,7 @@ const getPlayerContent = async (player, game) => {
     const highlight = content[i];
     try {
       if (highlight.type === 'video') {
-        if (highlight.description.includes(player)) {
+        if (highlight.title.includes(player)) {
           highlights.push(highlight);
         }
       }

@@ -14,24 +14,24 @@ const https = require('https');
 module.exports = app;
 
 // Certificate
-const privateKey = fs.readFileSync(
-  '/etc/letsencrypt/live/mlb-video.tk/privkey.pem',
-  'utf8'
-);
-const certificate = fs.readFileSync(
-  '/etc/letsencrypt/live/mlb-video.tk/cert.pem',
-  'utf8'
-);
-const ca = fs.readFileSync(
-  '/etc/letsencrypt/live/mlb-video.tk/chain.pem',
-  'utf8'
-);
+// const privateKey = fs.readFileSync(
+//   '/etc/letsencrypt/live/mlb-video.tk/privkey.pem',
+//   'utf8'
+// );
+// const certificate = fs.readFileSync(
+//   '/etc/letsencrypt/live/mlb-video.tk/cert.pem',
+//   'utf8'
+// );
+// const ca = fs.readFileSync(
+//   '/etc/letsencrypt/live/mlb-video.tk/chain.pem',
+//   'utf8'
+// );
 
-const credentials = {
-  key: privateKey,
-  cert: certificate,
-  ca: ca
-};
+// const credentials = {
+//   key: privateKey,
+//   cert: certificate,
+//   ca: ca
+// };
 
 // This is a global Mocha hook, used for resource cleanup.
 // Otherwise, Mocha v4+ never quits after tests.
@@ -90,25 +90,25 @@ const createApp = () => {
 };
 
 const startListening = () => {
-  // start listening (and create a 'server' object representing our server)
-  // Starting both http & https servers
-  const httpServer = http.createServer(app);
-  const httpsServer = https.createServer(credentials, app);
+  /**
+   * Deployment
+   */
+  // const httpServer = http.createServer(app);
+  // const httpsServer = https.createServer(credentials, app);
+  // httpServer.listen(80, () => {
+  //   console.log('HTTP Server running on port 80');
+  // });
 
-  httpServer.listen(80, () => {
-    console.log('HTTP Server running on port 80');
-  });
-
-  httpsServer.listen(443, () => {
-    console.log('HTTPS Server running on port 443');
-  });
+  // httpsServer.listen(443, () => {
+  //   console.log('HTTPS Server running on port 443');
+  // });
 
   /**
-   * Old Stuff
+   * Localhost
    */
-  // const server = app.listen(PORT, () =>
-  //   console.log(`Mixing it up on port ${PORT}`)
-  // );
+  const server = app.listen(PORT, () =>
+    console.log(`Mixing it up on port ${PORT}`)
+  );
 };
 
 const syncDb = () => db.sync();
